@@ -17,6 +17,8 @@ GoWise is a GeoAI Hackathon prototype that recommends **where and when** to do a
 - [x] Live Gradio API endpoint URL added below and smoke-tested externally (the latest call returned a structured ZeroGPU quota failure, not a live recommendation).
 - [x] 4–6 slide presentation completed.
 
+The React production build passes (`npm run build`, 24 October 2026). The backend test suite could not be run in this workspace because `pytest` is not installed. The deployed Space's Gradio JSON endpoint is reachable, but the latest inference attempt returned a ZeroGPU quota error; this is not a successful recommendation test. The public Space also does not expose the separate FastAPI `/health` and `/api/recommendations` routes.
+
 Do not mark an item complete until it has been tested. Replace every submission placeholder before submitting.
 
 The API foundation, provider clients, local Transformers loader, query extractor, deterministic scoring engine, and recommendation pipeline are implemented. The Hugging Face Gradio Space reports the team model ready and resolves a named Monday query to the correct upcoming local window. The Gradio HTTP endpoint returns typed JSON, but the latest remote smoke call was blocked by the Space's ZeroGPU run limit; a provider-backed recommendation has not yet been verified. This checkout's separate FastAPI/Docker app still needs its local model loaded and cold-start checked.
@@ -151,7 +153,7 @@ The hackathon requires a **public team model repository** on Hugging Face with t
 - Gradio Space: [JiteshJha/goWise](https://huggingface.co/spaces/JiteshJha/goWise)
 - Live structured Gradio HTTP endpoint: [`recommendation_json`](https://jiteshjha-gowise.hf.space/gradio_api/call/v2/recommendation_json) (queued two-step HTTP/SSE; verify from a separate client before submission)
 - Source code repository: [Jiteshhh08/GoWise---Ai-Outdoor-Planner](https://github.com/Jiteshhh08/GoWise---Ai-Outdoor-Planner)
-- Presentation (5 slides): [GoWise-GeoAI-Hackathon-2026.pptx](submission/GoWise-GeoAI-Hackathon-2026.pptx)
+- Presentation (5 slides): [GoWise-GeoAI-Hackathon-2026-Submission.pptx](submission/GoWise-GeoAI-Hackathon-2026-Submission.pptx)
 - Coding assistant disclosure: **OpenAI Codex (GPT-6)**. No hosted AI model is used by the running assistant; its configured small model runs locally through Transformers.
 
 Never claim a resource is public or online until it has been verified from a clean browser/session.
