@@ -12,10 +12,13 @@ PROVIDER_NAME = "Overpass API / OpenStreetMap"
 cache: TTLCache["OSMSearchResult"] = TTLCache(settings.cache_ttl_seconds, settings.cache_max_entries)
 
 VENUE_FILTERS = (
-    'nwr(around:{radius},{lat},{lon})["leisure"~"^(park|pitch|sports_centre|stadium|golf_course|nature_reserve|recreation_ground)$"];',
-    'nwr(around:{radius},{lat},{lon})["sport"~"^(tennis|golf|cricket|soccer|football)$"];',
-    'nwr(around:{radius},{lat},{lon})["highway"~"^(path|footway|track|bridleway)$"];',
-    'nwr(around:{radius},{lat},{lon})["tourism"="viewpoint"];',
+    'nwr(around:{radius},{lat},{lon})["leisure"~"^(park|garden|track|pitch|sports_centre|stadium|golf_course|nature_reserve|recreation_ground)$"];',
+    'nwr(around:{radius},{lat},{lon})["sport"~"^(running|cycling|tennis|golf|cricket|soccer|football)$"];',
+    'nwr(around:{radius},{lat},{lon})["highway"~"^(path|footway|track|bridleway|cycleway)$"];',
+    'nwr(around:{radius},{lat},{lon})["route"="bicycle"];',
+    'nwr(around:{radius},{lat},{lon})["tourism"~"^(viewpoint|picnic_site)$"];',
+    'nwr(around:{radius},{lat},{lon})["amenity"="events_venue"];',
+    'nwr(around:{radius},{lat},{lon})["natural"~"^(peak|waterfall|beach|heath|wood)$"];',
 )
 CONTEXT_FILTERS = (
     'nwr(around:{radius},{lat},{lon})["highway"~"^(motorway|trunk|primary|secondary)$"];',

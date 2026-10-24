@@ -3,6 +3,7 @@ import hashlib
 import threading
 import time
 from dataclasses import dataclass
+from datetime import datetime, timezone
 
 import httpx
 
@@ -28,6 +29,8 @@ class GeocodedPlace:
     osm_type: str | None
     osm_id: int | None
     source_url: str
+    fetched_at: datetime
+    importance: float | None
 
 
 async def _wait_for_nominatim_slot() -> None:
@@ -68,6 +71,7 @@ class NominatimGeocoder:
         if not isinstance(payload, list):
             raise ProviderError(PROVIDER_NAME, "returned an unexpected response shape")
 
+        fetched_at = datetime.now(timezone.utc)
         places: list[GeocodedPlace] = []
         for item in payload:
             if not isinstance(item, dict):
@@ -103,6 +107,8 @@ class NominatimGeocoder:
                     osm_type=osm_type,
                     osm_id=osm_id,
                     source_url=str(source_url or "https://www.openstreetmap.org/"),
+                    fetched_at=fetched_at,
+                    importance=float(item["importance"]) if isinstance(item.get("importance"), (int, float)) else None,
                 )
             )
 

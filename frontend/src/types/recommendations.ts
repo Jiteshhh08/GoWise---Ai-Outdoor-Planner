@@ -33,7 +33,8 @@ export type EvidenceRecord = {
 export type DataSource = string | { name?: string; source?: string; url?: string; source_url?: string }
 
 export type RecommendationResponse = {
-  status?: 'ok' | 'partial' | 'needs_clarification' | 'no_results' | string
+  status?: 'ok' | 'partial' | 'needs_clarification' | 'no_results' | 'data_unavailable' | 'unsupported_activity' | string
+  clarification_question?: string
   interpreted_query?: {
     activity?: string
     location_label?: string

@@ -19,7 +19,7 @@ GoWise is a GeoAI Hackathon prototype that recommends **where and when** to do a
 
 Do not mark an item complete until it has been tested. Replace every submission placeholder before submitting.
 
-The API foundation, provider clients, local Transformers loader, and constrained query extractor are being implemented in stages. Model weights are not downloaded in this workspace, and the recommendation pipeline is not yet connected; `POST /api/recommendations` intentionally returns HTTP 503 instead of sample recommendations.
+The API foundation, provider clients, local Transformers loader, query extractor, deterministic scoring engine, and recommendation pipeline are implemented. The endpoint uses live provider calls at request time and returns no recommendation if forecast weather is unavailable. Model weights are not downloaded in this workspace, and a real end-to-end call against upstream providers has not yet been verified. The API therefore remains unready until its local model loads; it returns HTTP 503 rather than sample recommendations during model startup or when model loading fails.
 
 ## Features
 
@@ -28,6 +28,8 @@ The API foundation, provider clients, local Transformers loader, and constrained
 - Hourly weather, air-quality data where available, and mapped geospatial context.
 - Ranked combinations of places and time slots, with alternatives and practical advice.
 - A map plus visible supporting evidence, source labels, timestamps, limitations and missing-data warnings.
+
+The scoring pipeline compares multiple tag-matched OSM candidates and hourly forecast times. Scores are heuristic. AQ/model gaps lower coverage and produce warnings; an absent weather forecast prevents a recommendation. Traffic is not live: mapped road proximity is only a proxy.
 
 ## Architecture
 

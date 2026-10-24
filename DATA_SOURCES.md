@@ -4,14 +4,14 @@ The hackathon supplies no dataset or server. Fetch data live for each query usin
 
 ## Current implementation status
 
-Backend provider clients now exist for Nominatim geocoding, bounded Overpass venue/context lookup, and batched Open-Meteo weather and air-quality forecasts. They use timeouts, bounded retry, and process-local success caches. They are not yet connected to the recommendation request pipeline, so the API currently returns 503 and these services must not be described as live results until integration is complete.
+The recommendation endpoint now connects Nominatim, bounded Overpass venue/context lookup, and batched Open-Meteo forecast/AQ providers. It ranks matched OSM-tagged venues across hourly slots and returns evidence for the selected option. Provider clients use timeouts, bounded retries, and process-local success caches. The actual upstream providers and model have not yet been exercised in this workspace, so a real live end-to-end query is still unverified. A provider failure returns a partial result only when usable weather remains; without forecast weather, the endpoint returns no recommendation.
 
 ## Source register
 
 | Source | Intended use | Fields / output | Key limits and failure behavior |
 |---|---|---|---|
-| [Nominatim](https://nominatim.openstreetmap.org/) | Convert user-entered area/place to coordinates. | Place label, latitude/longitude, bounding box when provided, source URL. | Send an identifying User-Agent; apply a process-wide limit of at most one request per second; cache successful lookups; do not implement autocomplete or send personal/health details. On ambiguous/no result, ask for clarification; never silently choose a different city. |
-| [Overpass API](https://overpass-api.de/api/interpreter) + [OpenStreetMap](https://www.openstreetmap.org/) | Discover candidate parks, pitches/courts, trails/paths and relevant outdoor venues; gather mapped road, green-cover, water and industrial/land-use context. | OSM element ID/type, tags, name where supplied, representative coordinates and source link. | One bounded query per search area with an explicit timeout and server memory bound; cap parsed features and cache successes. OSM only contains mapped objects; absence of a mapped feature is not proof that it does not exist. Show OSM attribution. |
+| [Nominatim](https://nominatim.openstreetmap.org/) | Convert user-entered area/place to coordinates. | Place label, latitude/longitude, bounding box when provided, source URL and fetch time. | Send an identifying User-Agent; apply a process-wide limit of at most one request per second; cache successful lookups; do not implement autocomplete or send personal/health details. No result and similarly ranked results are surfaced for clarification. |
+| [Overpass API](https://overpass-api.de/api/interpreter) + [OpenStreetMap](https://www.openstreetmap.org/) | Discover activity-tagged candidate venues and gather mapped road, green-cover, water and industrial/land-use context. | OSM element ID/type, tags, name where supplied, representative coordinates, source link and fetch time. | One bounded query per search area with an explicit timeout and server memory bound; cap parsed features and cache successes. Candidate matching uses tags, never names. OSM only contains mapped objects; absence of a mapped feature is not proof that it does not exist. Show exact OSM attribution. |
 | [Open-Meteo Forecast API](https://open-meteo.com/en/docs) | Batched hourly weather forecast and daily daylight times for candidate coordinates. | Available temperature/apparent temperature, precipitation probability/amount, weather code, wind speed/direction, UV, sunrise and sunset. | Request UTC timestamps across a bounded seven-day horizon, store forecast-valid and fetch times separately, and preserve missing values as unavailable. |
 | [Open-Meteo Air Quality API](https://open-meteo.com/en/docs/air-quality-api) | Batched hourly air-quality forecast for candidate coordinates. | Available PM2.5, PM10, ozone, nitrogen dioxide and AQI fields, with units as returned. | Coverage and resolution vary by pollutant/domain; query the exact returned fields and never assume a variable exists. Forecast data is modelled regional guidance, not a sensor measurement at a venue. Disclose valid and fetch times. |
 | [OSRM routing](https://project-osrm.org/) — optional | Estimate route distance/time to shortlisted candidates. | Route distance and duration, route status, source endpoint. | Use only if available and allowed by current service policy. Public OSRM route duration is an estimate, **not live congestion**. On error, mark travel time unavailable rather than inventing one. |
@@ -67,6 +67,15 @@ The values above are a schema example only. Runtime output must carry real value
 - Set timeouts, bounded retries/backoff, and clear per-provider failure messages.
 - Do not treat cache expiry or provider failure as proof that a place/period is safe.
 - When one provider fails, use only the remaining real data, reduce coverage/confidence, and display the missing source; if required minimum inputs are absent, ask for a different query or return no recommendation.
+
+## Implemented request flow
+
+1. The local SLM extracts a supported activity, explicit typed location, and upcoming time range. Missing required fields are clarified; `near me` is not resolved from IP or model memory.
+2. Nominatim resolves the typed location. Overpass returns bounded venue and context features; candidates must have coordinates and tags matching the requested activity.
+3. The backend selects a spatially distributed set of candidates, requests weather and AQ in batches, and compares hourly forecast slots inside the requested window.
+4. Deterministic scoring ranks each candidate/time pair. The response includes provider-backed evidence and timestamps, alternatives, source links, warnings and a coverage fraction. Forecast weather is required for a recommendation; AQ/context gaps reduce coverage and are disclosed.
+
+No production-provider query has been verified yet. Do not treat mocked tests as evidence that an external provider is reachable at demo time.
 
 ## Required disclosure in the UI and README
 

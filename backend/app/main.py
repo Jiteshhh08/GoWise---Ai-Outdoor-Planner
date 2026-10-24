@@ -1,13 +1,47 @@
+import asyncio
+from contextlib import asynccontextmanager
+from collections.abc import AsyncIterator
+
+import httpx
 from fastapi import FastAPI, HTTPException, Request, status
 
+from .model.local_model import LocalLanguageModel, ModelNotReadyError
 from .schemas import HealthResponse, RecommendationRequest, RecommendationResponse
+from .providers.http import make_http_client
+from .services.recommendations import RecommendationService
 
 APP_VERSION = "0.1.0"
+
+@asynccontextmanager
+async def lifespan(application: FastAPI) -> AsyncIterator[None]:
+    client = make_http_client()
+    model = LocalLanguageModel()
+    application.state.model = model
+    application.state.provider_client = client
+    application.state.recommendation_service = RecommendationService(client, model)
+
+    async def load_model() -> None:
+        try:
+            await model.load()
+            application.state.model_ready = True
+        except Exception as error:
+            application.state.model_ready = False
+            application.state.model_error = type(error).__name__
+
+    loader = asyncio.create_task(load_model())
+    try:
+        yield
+    finally:
+        if not loader.done():
+            loader.cancel()
+        await client.aclose()
+
 
 app = FastAPI(
     title="GoWise Outdoor Planner API",
     description="Evidence-grounded outdoor activity recommendations.",
     version=APP_VERSION,
+    lifespan=lifespan,
 )
 app.state.model_ready = False
 app.state.recommendation_service = None
@@ -38,4 +72,10 @@ async def recommendations(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="The recommendation service is not ready yet.",
         )
-    return await service.recommend(payload.question)
+    try:
+        return await service.recommend(payload.question)
+    except ModelNotReadyError as error:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="The local language model is not ready yet.",
+        ) from error

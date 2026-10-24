@@ -172,6 +172,11 @@ class QueryExtractor:
             raise QueryExtractionError("The local model returned query fields outside the expected schema.") from error
 
         activity = _canonical_activity(extraction.activity)
+        if extraction.activity and activity is None:
+            return QueryClarification(
+                question="That activity is not supported yet. Please choose running, cycling, golf, cricket, outdoor football, tennis, hiking, picnic, an outdoor event, or photography.",
+                warnings=["The requested activity is outside the ten configured activity categories."],
+            )
         missing: list[str] = []
         if activity is None:
             missing.append("activity")

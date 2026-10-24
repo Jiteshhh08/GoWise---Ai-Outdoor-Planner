@@ -20,6 +20,8 @@ class OverpassTests(unittest.TestCase):
         self.assertIn('"leisure"', query)
         self.assertIn('"highway"', query)
         self.assertIn('"landuse"', query)
+        for required_activity_tag in ('"sport"', '"route"="bicycle"', '"tourism"', '"amenity"="events_venue"', '"natural"'):
+            self.assertIn(required_activity_tag, query)
         self.assertIn("around:5000,19.117600,72.906000", query)
 
     def test_search_parses_elements_and_caches_the_response(self) -> None:

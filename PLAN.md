@@ -8,36 +8,36 @@ Official brief: https://geosysiot.in/geoai-hackathon/#guidelines
 ## Phase 0 — repository and scope
 - [ ] Inspect the existing repository before changing files; retain working code and package-lock files.
 - [ ] Create a short task list and agree on a minimal React + FastAPI layout.
-- [ ] Add `.env.example`, `.gitignore`, dependency manifests, and health endpoint.
-- [ ] Define Pydantic request/response schemas before building UI.
+- [x] Add `.env.example`, `.gitignore`, dependency manifests, and health endpoint.
+- [x] Define Pydantic request/response schemas before building UI.
 
 **Exit check:** frontend and backend start locally; `GET /health` responds.
 
 ## Phase 1 — live data, no LLM yet
-- [ ] Implement Nominatim place-name geocoding with user-agent, timeout, bounded retry, and cache.
-- [ ] Implement a bounded Overpass query around a resolved coordinate/radius for candidate parks, pitches/courts, trails/paths, and relevant outdoor venues.
-- [ ] Fetch hourly weather and daylight variables from Open-Meteo Forecast API.
-- [ ] Fetch hourly PM2.5/PM10 and relevant air-quality variables from Open-Meteo Air Quality API when available.
-- [ ] Collect OSM context around each candidate: green cover, nearby roads/road class, water bodies, and industrial/land-use features.
+- [x] Implement Nominatim place-name geocoding with user-agent, timeout, bounded retry, and cache.
+- [x] Implement a bounded Overpass query around a resolved coordinate/radius for candidate parks, pitches/courts, trails/paths, and relevant outdoor venues.
+- [x] Fetch hourly weather and daylight variables from Open-Meteo Forecast API.
+- [x] Fetch hourly PM2.5/PM10 and relevant air-quality variables from Open-Meteo Air Quality API when available.
+- [x] Collect OSM context around each candidate: green cover, nearby roads/road class, water bodies, and industrial/land-use features.
 - [ ] Add an optional OSRM route estimate only if it can be done reliably within time. Never label it as live traffic.
 - [ ] Return a structured data bundle with provider names, source URLs, fetch times, and partial-data warnings.
 
 **Exit check:** one location query returns actual current API responses; provider failure is shown honestly rather than replaced with fake values.
 
 ## Phase 2 — deterministic decision engine
-- [ ] Configure all ten required activities in one activity-rules module.
-- [ ] Normalize units and align venue data with hourly forecast slots.
-- [ ] Score multiple venue/time combinations with transparent, configurable rules for activity fit, weather, air quality, daylight, greenery, road exposure, wind-aligned potential sources, and accessibility where available.
+- [x] Configure all ten required activities in one activity-rules module.
+- [x] Normalize units and align venue data with hourly forecast slots.
+- [x] Score multiple venue/time combinations with transparent, configurable rules for activity fit, weather, air quality, daylight, greenery, road exposure, wind-aligned potential sources, and accessibility where available.
 - [ ] Version the scoring rules and expose score factors; label score as a heuristic, not a validated medical or safety metric.
-- [ ] Handle missing AQI/forecast/OSM data by lowering coverage/confidence and explaining the gap; do not invent a substitute measurement.
-- [ ] Produce ranked alternatives, not just one result.
+- [x] Handle missing AQI/forecast/OSM data by lowering coverage/confidence and explaining the gap; do not invent a substitute measurement.
+- [x] Produce ranked alternatives, not just one result.
 
 **Exit check:** deterministic tests verify ranking, time-slot selection, activity constraints, and missing-data behavior without needing a live LLM.
 
 ## Phase 3 — SLM integration and grounded response
-- [ ] Use a locally loaded open-weights model with at most 3B parameters. Start with `Qwen/Qwen2.5-1.5B-Instruct`; check the current licence/model card.
-- [ ] Implement query extraction to a validated JSON object: activity, location, radius, time range, and explicitly stated profile details.
-- [ ] If required fields are missing/ambiguous, ask for clarification instead of guessing.
+- [x] Implement a local Transformers loader configured for the open-weights `Qwen/Qwen2.5-1.5B-Instruct` model (model weights and runtime load remain unverified).
+- [x] Implement query extraction to a validated JSON object: activity, location, radius, time range, and explicitly stated profile details.
+- [x] If required fields are missing/ambiguous, ask for clarification instead of guessing.
 - [ ] Publish a public team Hugging Face model repository that meets the rulebook (weights or adapter as required, model card, open licence, and successful `from_pretrained(...)` load). Do not mark this done merely because the upstream base model is public.
 - [ ] Implement a second, constrained generation step that may only explain the structured scores/evidence provided by the backend. Validate its JSON or fall back to a deterministic text renderer.
 - [ ] Never call a hosted LLM/inference API in production.
@@ -45,13 +45,13 @@ Official brief: https://geosysiot.in/geoai-hackathon/#guidelines
 **Exit check:** logs make it clear the model ran locally; outputs do not contain unsupported factual claims.
 
 ## Phase 4 — React interface
-- [ ] Build a responsive question input with a few example prompts.
-- [ ] Display parsed activity/location/time and a clear missing-information state.
-- [ ] Display ranked place/time cards and an interactive Leaflet map with candidate pins.
-- [ ] Show live weather/AQ values only with units, timestamps, and source labels.
-- [ ] Show practical advice: what to carry, what to watch for, and conditions/times to avoid.
-- [ ] Show data-source coverage, uncertainty, OpenStreetMap attribution, and route/traffic limitations.
-- [ ] Implement loading, no-results, timeout, partial-data, and model-unavailable states.
+- [x] Build a responsive question input with a few example prompts.
+- [x] Display parsed activity/location/time and a clear missing-information state.
+- [x] Display ranked place/time cards and an interactive Leaflet map with candidate pins.
+- [x] Show live weather/AQ values only with units, timestamps, and source labels.
+- [x] Show practical advice: what to carry, what to watch for, and conditions/times to avoid.
+- [x] Show data-source coverage, uncertainty, OpenStreetMap attribution, and route/traffic limitations.
+- [x] Implement loading, no-results, timeout, partial-data, and model-unavailable states.
 
 **Exit check:** a user can enter an unseen free-form question and inspect the evidence behind the recommendation.
 

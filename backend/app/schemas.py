@@ -72,7 +72,15 @@ class DataSource(BaseModel):
 
 
 class RecommendationResponse(BaseModel):
-    status: Literal["ok", "partial", "needs_clarification", "no_results"]
+    status: Literal[
+        "ok",
+        "partial",
+        "needs_clarification",
+        "no_results",
+        "data_unavailable",
+        "unsupported_activity",
+    ]
+    clarification_question: str | None = None
     interpreted_query: InterpretedQuery | None = None
     recommendation: RecommendationOption | None = None
     alternatives: list[RecommendationOption] = Field(default_factory=list)

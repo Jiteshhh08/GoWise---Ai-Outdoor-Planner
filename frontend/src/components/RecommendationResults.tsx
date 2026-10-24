@@ -71,7 +71,7 @@ export default function RecommendationResults({ data }: { data: RecommendationRe
   const hasAdvice = !!(data.advice?.carry?.length || data.advice?.watch_for?.length || data.advice?.avoid_if?.length)
 
   if (!recommendation) return <div className="planner-response" aria-live="polite">
-    <div className="clarification-card"><span className="clarification-icon"><CircleAlert size={19} /></span><div><span className="section-kicker">A LITTLE MORE TO GO ON</span><h3>{data.status === 'no_results' ? 'No mapped options came back' : 'Can you narrow it down?'}</h3><p>{data.warnings?.[0] || (data.status === 'no_results' ? 'Try a nearby area or a different activity.' : 'Add a place and a time window so the planner can compare live conditions.')}</p></div></div>
+    <div className="clarification-card"><span className="clarification-icon"><CircleAlert size={19} /></span><div><span className="section-kicker">{data.status === 'data_unavailable' ? 'LIVE DATA UNAVAILABLE' : data.status === 'unsupported_activity' ? 'ACTIVITY NOT SUPPORTED' : 'A LITTLE MORE TO GO ON'}</span><h3>{data.status === 'no_results' ? 'No mapped options came back' : data.status === 'data_unavailable' ? 'No evidence-backed plan yet' : data.status === 'unsupported_activity' ? 'Try one of the supported activities' : 'Can you narrow it down?'}</h3><p>{data.clarification_question || data.warnings?.[0] || (data.status === 'no_results' ? 'Try a nearby area or a different activity.' : 'Add a place and a time window so the planner can compare live conditions.')}</p></div></div>
     {!!data.warnings?.length && <WarningList warnings={data.warnings} />}
   </div>
 
