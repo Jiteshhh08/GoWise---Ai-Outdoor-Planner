@@ -149,7 +149,7 @@ The hackathon requires a **public team model repository** on Hugging Face with t
 - Base model: `Qwen/Qwen2.5-1.5B-Instruct` (verify before submission)
 - Team model repository: [JiteshJha/gowise-qwen2.5-1.5b-instruct](https://huggingface.co/JiteshJha/gowise-qwen2.5-1.5b-instruct) (loaded by the Gradio Space; public card/licence checks remain)
 - Gradio Space: [JiteshJha/goWise](https://huggingface.co/spaces/JiteshJha/goWise)
-- Live Gradio HTTP endpoint: [`/gradio_api/call/v2/recommendations`](https://jiteshjha-gowise.hf.space/gradio_api/call/v2/recommendations) (listed by the running Space API; needs a clean external smoke test)
+- Live structured Gradio HTTP endpoint: [`recommendation_json`](https://jiteshjha-gowise.hf.space/gradio_api/call/v2/recommendation_json) (queued two-step HTTP/SSE; verify from a separate client before submission)
 - Source code repository: [Jiteshhh08/GoWise---Ai-Outdoor-Planner](https://github.com/Jiteshhh08/GoWise---Ai-Outdoor-Planner)
 - Presentation (5 slides): [GoWise-GeoAI-Hackathon-2026.pptx](submission/GoWise-GeoAI-Hackathon-2026.pptx)
 - Coding assistant disclosure: **OpenAI Codex (GPT-6)**. No hosted AI model is used by the running assistant; its configured small model runs locally through Transformers.
