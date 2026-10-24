@@ -118,7 +118,8 @@ class RecommendationService:
 
         parsed = InterpretedQuery(
             activity=query.activity, location_label=query.location_label, radius_km=query.radius_km,
-            start_time=query.start_time, end_time=query.end_time, profile_flags=query.profile_flags,
+            start_time=query.start_time, end_time=query.end_time, timezone=query.timezone,
+            profile_flags=query.profile_flags,
         )
         warnings = list(query.warnings)
         sources: dict[str, DataSource] = {}

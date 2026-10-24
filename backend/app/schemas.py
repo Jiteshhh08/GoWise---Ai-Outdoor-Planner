@@ -24,6 +24,7 @@ class InterpretedQuery(BaseModel):
     radius_km: float | None = Field(default=None, ge=0.1, le=100)
     start_time: datetime | None = None
     end_time: datetime | None = None
+    timezone: str | None = None
     profile_flags: list[str] = Field(default_factory=list)
 
 
