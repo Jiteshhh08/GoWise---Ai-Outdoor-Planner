@@ -1,5 +1,5 @@
 import hashlib
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime, timezone
 
 import httpx
@@ -44,6 +44,7 @@ class OSMSearchResult:
     features: list[OSMFeature]
     fetched_at: str
     source_url: str
+    stale: bool = False
 
 
 def build_query(latitude: float, longitude: float, radius_km: float) -> str:
@@ -76,14 +77,22 @@ class OverpassPlaces:
             return cached
 
         query = build_query(latitude, longitude, radius_km)
-        payload = await request_json(
-            self.client,
-            PROVIDER_NAME,
-            "POST",
-            settings.overpass_url,
-            data={"data": query},
-            headers={"Accept": "application/json", "Content-Type": "application/x-www-form-urlencoded"},
-        )
+        try:
+            payload = await request_json(
+                self.client,
+                PROVIDER_NAME,
+                "POST",
+                settings.overpass_url,
+                data={"data": query},
+                headers={"Accept": "application/json", "Content-Type": "application/x-www-form-urlencoded"},
+                timeout=settings.overpass_timeout_seconds,
+                max_retries=settings.overpass_max_retries,
+            )
+        except ProviderError:
+            stale = cache.get_stale(cache_key, settings.overpass_stale_cache_seconds)
+            if stale is not None:
+                return replace(stale, stale=True)
+            raise
         if not isinstance(payload, dict) or not isinstance(payload.get("elements"), list):
             raise ProviderError(PROVIDER_NAME, "returned an unexpected response shape")
 

@@ -142,7 +142,19 @@ class RecommendationService:
             osm_result = await self.places.search(place.latitude, place.longitude, query.radius_km)
         except ProviderError as error:
             return self._unavailable(parsed, warnings, f"Mapped-place lookup failed: {error}", sources.values())
-        sources["osm"] = DataSource(name=OSM_NAME, url=osm_result.source_url, note="© OpenStreetMap contributors")
+        sources["osm"] = DataSource(
+            name=OSM_NAME,
+            url=osm_result.source_url,
+            note=(
+                f"Cached map data fetched at {osm_result.fetched_at}; place details may be out of date. © OpenStreetMap contributors"
+                if osm_result.stale
+                else "© OpenStreetMap contributors"
+            ),
+        )
+        if osm_result.stale:
+            warnings.append(
+                f"Overpass did not respond; using cached OpenStreetMap features fetched at {osm_result.fetched_at}. Map details may be out of date."
+            )
         matched = [feature for feature in osm_result.features if classify_venue(query.activity, feature.tags) and feature.latitude is not None and feature.longitude is not None]
         candidates = _diverse_candidates(matched, place.latitude, place.longitude, settings.max_candidates)
         if not candidates:
@@ -230,7 +242,7 @@ class RecommendationService:
             all_warnings.append("Only one mapped place matched; time slots were compared at that place.")
         coverage = best[5].coverage
         return RecommendationResponse(
-            status="partial" if provider_errors or coverage < 0.95 else "ok",
+            status="partial" if provider_errors or osm_result.stale or coverage < 0.95 else "ok",
             interpreted_query=parsed, recommendation=options[0], alternatives=options[1:], advice=advice,
             evidence_summary=evidence_summary, evidence=evidence, data_sources=list(sources.values()),
             warnings=list(dict.fromkeys(all_warnings)), coverage=coverage,

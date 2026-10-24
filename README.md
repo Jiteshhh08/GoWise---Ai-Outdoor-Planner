@@ -121,6 +121,9 @@ Keep local secrets in `.env` and deployment secrets in the host's secret setting
 | `PORT` | HTTP port provided by deployment platform; Docker Space defaults to `7860`. |
 | `CACHE_TTL_SECONDS` | Cache lifetime for eligible provider responses. |
 | `REQUEST_TIMEOUT_SECONDS` | External API request timeout. |
+| `OVERPASS_TIMEOUT_SECONDS` | Per-request timeout for the Overpass map query (default 30 seconds). |
+| `OVERPASS_MAX_RETRIES` | Bounded retry count for Overpass timeouts, network errors, HTTP 429, and server errors. |
+| `OVERPASS_STALE_CACHE_SECONDS` | Maximum age for cached OSM features used during an Overpass outage; stale map data is labeled and never substituted with sample values. |
 | `MAX_SEARCH_RADIUS_KM` | Hard cap on user-requested search radius. |
 | `DEFAULT_SEARCH_RADIUS_KM` | Search distance used when the user leaves radius unspecified. |
 | `DEFAULT_TIMEZONE` | Local reference timezone for interpreting relative dates. |

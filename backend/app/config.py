@@ -17,6 +17,9 @@ class Settings:
     model_max_output_tokens: int = int(os.getenv("MODEL_MAX_OUTPUT_TOKENS", "256"))
     default_timezone: str = os.getenv("DEFAULT_TIMEZONE", "Asia/Kolkata")
     request_timeout_seconds: float = float(os.getenv("REQUEST_TIMEOUT_SECONDS", "12"))
+    overpass_timeout_seconds: float = float(os.getenv("OVERPASS_TIMEOUT_SECONDS", "30"))
+    overpass_max_retries: int = int(os.getenv("OVERPASS_MAX_RETRIES", "2"))
+    overpass_stale_cache_seconds: int = int(os.getenv("OVERPASS_STALE_CACHE_SECONDS", "86400"))
     cache_ttl_seconds: int = int(os.getenv("CACHE_TTL_SECONDS", "900"))
     geocode_cache_ttl_seconds: int = int(os.getenv("GEOCODE_CACHE_TTL_SECONDS", "86400"))
     max_search_radius_km: float = float(os.getenv("MAX_SEARCH_RADIUS_KM", "50"))
@@ -39,6 +42,10 @@ class Settings:
     def __post_init__(self) -> None:
         if self.request_timeout_seconds <= 0:
             raise ValueError("REQUEST_TIMEOUT_SECONDS must be positive.")
+        if self.overpass_timeout_seconds <= 0:
+            raise ValueError("OVERPASS_TIMEOUT_SECONDS must be positive.")
+        if self.overpass_max_retries < 0 or self.overpass_stale_cache_seconds < 0:
+            raise ValueError("Overpass retry and stale-cache bounds cannot be negative.")
         if self.cache_ttl_seconds < 0 or self.geocode_cache_ttl_seconds < 0:
             raise ValueError("Cache TTL values cannot be negative.")
         if not (0.1 <= self.max_search_radius_km <= 50):
