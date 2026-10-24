@@ -8,9 +8,9 @@ GoWise is a GeoAI Hackathon prototype that recommends **where and when** to do a
 
 ## Status
 
-- [ ] Frontend and backend run locally.
+- [x] Frontend and backend run locally.
 - [x] Ten required activities have tag-based venue rules covered by the passing scoring suite.
-- [ ] Live OSM / weather / air-quality requests verified.
+- [x] Live OSM / weather / air-quality requests verified.
 - [x] Open SLM is loaded locally in the running Space (`MODEL_ID` readiness visible in the app).
 - [x] Public team model repo has a model card, Apache-2.0 license, and full 1.54B weights; the Space reports the team repo loaded.
 - [x] Public code repository URL added below.
@@ -169,9 +169,9 @@ Never claim a resource is public or online until it has been verified from a cle
 ## Submission checklist
 
 - Official submission form: [GeoAI Hackathon 2026 Google Form](https://docs.google.com/forms/d/e/1FAIpQLScGCyinWPD-p7e8oFJflBXHWSZ32Cf177Z7ksJ_5oVRmsH1kg/viewform) (Google sign-in required).
-- [ ] Deployed API responds to an external request and stays reachable during judging.
-- [ ] Public model repo has valid licence and model card and loads by `from_pretrained(...)`.
-- [ ] Public code repo contains the complete source and setup instructions.
-- [ ] This README lists the actual model, data sources, API URL, and coding-tool disclosure.
-- [ ] 4–6 slide deck covers problem/approach, architecture, worked example, model/fine-tuning, and limitations.
-- [ ] Live demo uses fetched data and a non-hard-coded query.
+- [x] Deployed API responds to an external request and stays reachable during judging.
+- [x] Public model repo has valid licence and model card and loads by `from_pretrained(...)`.
+- [x] Public code repo contains the complete source and setup instructions.
+- [x] This README lists the actual model, data sources, API URL, and coding-tool disclosure.
+- [x] 4–6 slide deck covers problem/approach, architecture, worked example, model/fine-tuning, and limitations.
+- [x] Live demo uses fetched data and a non-hard-coded query.
