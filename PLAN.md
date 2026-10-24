@@ -35,12 +35,12 @@ Official brief: https://geosysiot.in/geoai-hackathon/#guidelines
 **Exit check:** deterministic tests verify ranking, time-slot selection, activity constraints, and missing-data behavior without needing a live LLM.
 
 ## Phase 3 — SLM integration and grounded response
-- [x] Implement a local Transformers loader configured for the open-weights `Qwen/Qwen2.5-1.5B-Instruct` model (model weights and runtime load remain unverified).
+- [x] Implement a local Transformers loader configured for the team's public Qwen2.5-1.5B repository; the running Space reports that model loaded (inference is currently quota-blocked).
 - [x] Implement query extraction to a validated JSON object: activity, location, radius, time range, and explicitly stated profile details.
 - [x] If required fields are missing/ambiguous, ask for clarification instead of guessing.
-- [ ] Publish a public team Hugging Face model repository that meets the rulebook (weights or adapter as required, model card, open licence, and successful `from_pretrained(...)` load). Do not mark this done merely because the upstream base model is public.
+- [x] Publish a public team Hugging Face model repository that meets the rulebook (full 1.54B weights, model card, Apache-2.0 licence); the deployed Space reports the team model loaded through its local Transformers loader.
 - [x] Implement a second, constrained generation step that selects only supplied evidence IDs; validate the IDs and render the explanation deterministically from provider records with a safe fallback.
-- [ ] Never call a hosted LLM/inference API in production.
+- [x] Production code uses the local Transformers model and contains no hosted inference API call.
 
 **Exit check:** logs make it clear the model ran locally; outputs do not contain unsupported factual claims.
 
@@ -56,13 +56,13 @@ Official brief: https://geosysiot.in/geoai-hackathon/#guidelines
 **Exit check:** a user can enter an unseen free-form question and inspect the evidence behind the recommendation.
 
 ## Phase 5 — deployment and submission assets
-- [x] Build the React app in the Docker image and serve it from FastAPI so frontend and API share one origin.
+- [ ] Build the React app in the Docker image and serve it from FastAPI so frontend and API share one origin (Docker build not verified).
 - [ ] Deploy as a Hugging Face Docker Space (or document a concrete tested alternative); expose `GET /health` and `POST /api/recommendations`.
 - [x] Configure model repo ID and deployment environment variables without committing secrets (Space model readiness verified; no secret values committed).
 - [ ] Test the public API from a separate network/session and test a cold start. Keep the endpoint available throughout judging.
-- [ ] Verify the model repo is public, has an open licence/model card, and loads through `from_pretrained(...)`.
+- [x] Verify the model repo is public, has an open licence/model card, and loads through the deployed local `from_pretrained(...)` path.
 - [x] Update `README.md` with actual code-repo URL, model-repo URL, live endpoint URL, base model, data sources, and AI coding-tool disclosure.
-- [x] Prepare a five-slide presentation covering the request flow, architecture, scoring/evidence, and verified/unverified status. Add a real live worked example after provider and model checks pass.
+- [x] Prepare a five-slide presentation covering the request flow, architecture, scoring/evidence, model/fine-tuning status, and verified/unverified status. No live worked example is claimed because live inference/provider checks did not complete.
 - [ ] Complete `TESTING.md`; run all commands and record what actually passed.
 
 **Exit check:** all mandatory deliverables are real links, not placeholders; one live query works end to end.

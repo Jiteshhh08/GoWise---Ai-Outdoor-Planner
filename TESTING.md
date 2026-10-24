@@ -9,6 +9,7 @@ The system must remain truthful when data or the model is unavailable. Automated
 - The full backend pytest suite was attempted but did not complete in this Windows sandbox; the async/socketpair path hung without producing test results. Treat all other backend checks below as unverified.
 - The deployed Gradio JSON endpoint returned a ZeroGPU quota error on the last inference attempt. No live provider-backed recommendation has been verified.
 - The hosted Gradio Space does not expose the source FastAPI app's exact `/health` and `/api/recommendations` routes.
+- Hugging Face's public model metadata shows the team repository is public, licensed Apache-2.0, and contains 1,543,714,304 BF16 parameters with model weights and a card. The running Space displays the team `MODEL_ID` as loaded by its local Transformers loader.
 
 ## 1. Unit tests
 

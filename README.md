@@ -11,8 +11,8 @@ GoWise is a GeoAI Hackathon prototype that recommends **where and when** to do a
 - [ ] Frontend and backend run locally.
 - [ ] Ten required activities tested.
 - [ ] Live OSM / weather / air-quality requests verified.
-- [ ] Open SLM loads locally and is used by the running assistant.
-- [ ] Public Hugging Face model repository verified with `from_pretrained(...)`.
+- [x] Open SLM is loaded locally in the running Space (`MODEL_ID` readiness visible in the app).
+- [x] Public team model repo has a model card, Apache-2.0 license, and full 1.54B weights; the Space reports the team repo loaded.
 - [x] Public code repository URL added below.
 - [x] Live Gradio API endpoint URL added below and smoke-tested externally (the latest call returned a structured ZeroGPU quota failure, not a live recommendation).
 - [x] 4–6 slide presentation completed.
@@ -21,7 +21,7 @@ The React production build passes (`npm run build`, 24 October 2026), and the fo
 
 Do not mark an item complete until it has been tested. Replace every submission placeholder before submitting.
 
-The API foundation, provider clients, local Transformers loader, query extractor, deterministic scoring engine, and recommendation pipeline are implemented. The Hugging Face Gradio Space reports the team model ready and resolves a named Monday query to the correct upcoming local window. The Gradio HTTP endpoint returns typed JSON, but the latest remote smoke call was blocked by the Space's ZeroGPU run limit; a provider-backed recommendation has not yet been verified. This checkout's separate FastAPI/Docker app still needs its local model loaded and cold-start checked.
+The API foundation, provider clients, local Transformers loader, query extractor, deterministic scoring engine, and recommendation pipeline are implemented. The public team model repository contains the full 1.54B Apache-2.0 weights and a model card; the live Space displays the team model as loaded and resolves a named Monday query to the correct upcoming local window. The Gradio HTTP endpoint returns typed JSON, but the latest inference attempt was blocked by the Space's ZeroGPU run limit; a provider-backed recommendation has not yet been verified. This checkout's separate FastAPI/Docker app still needs a local model load and cold-start check.
 
 ## Features
 
@@ -149,7 +149,7 @@ Default model: `Qwen/Qwen2.5-1.5B-Instruct` (1.5B; the Hugging Face listing curr
 The hackathon requires a **public team model repository** on Hugging Face with the required weights or adapter, a model card and an open licence; it must load with `from_pretrained(...)`. An upstream model page by itself is not proof that this deliverable has been completed. Test loading from the team's repository and record the exact model ID below.
 
 - Base model: `Qwen/Qwen2.5-1.5B-Instruct` (verify before submission)
-- Team model repository: [JiteshJha/gowise-qwen2.5-1.5b-instruct](https://huggingface.co/JiteshJha/gowise-qwen2.5-1.5b-instruct) (loaded by the Gradio Space; public card/licence checks remain)
+- Team model repository: [JiteshJha/gowise-qwen2.5-1.5b-instruct](https://huggingface.co/JiteshJha/gowise-qwen2.5-1.5b-instruct) (public; full 1.54B weights, model card, Apache-2.0 license; Space reports it loaded)
 - Gradio Space: [JiteshJha/goWise](https://huggingface.co/spaces/JiteshJha/goWise)
 - Live structured Gradio HTTP endpoint: [`recommendation_json`](https://jiteshjha-gowise.hf.space/gradio_api/call/v2/recommendation_json) (queued two-step HTTP/SSE; verify from a separate client before submission)
 - Source code repository: [Jiteshhh08/GoWise---Ai-Outdoor-Planner](https://github.com/Jiteshhh08/GoWise---Ai-Outdoor-Planner)
