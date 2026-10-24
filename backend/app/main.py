@@ -1,9 +1,11 @@
 import asyncio
 from contextlib import asynccontextmanager
 from collections.abc import AsyncIterator
+from pathlib import Path
 
 import httpx
 from fastapi import FastAPI, HTTPException, Request, status
+from fastapi.staticfiles import StaticFiles
 
 from .model.local_model import LocalLanguageModel, ModelNotReadyError
 from .schemas import HealthResponse, RecommendationRequest, RecommendationResponse
@@ -79,3 +81,8 @@ async def recommendations(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="The local language model is not ready yet.",
         ) from error
+
+
+frontend_dist = Path(__file__).resolve().parents[2] / "frontend" / "dist"
+if frontend_dist.is_dir():
+    app.mount("/", StaticFiles(directory=frontend_dist, html=True), name="frontend")

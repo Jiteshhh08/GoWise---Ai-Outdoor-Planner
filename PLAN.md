@@ -56,7 +56,7 @@ Official brief: https://geosysiot.in/geoai-hackathon/#guidelines
 **Exit check:** a user can enter an unseen free-form question and inspect the evidence behind the recommendation.
 
 ## Phase 5 — deployment and submission assets
-- [ ] Build the React app and serve it from FastAPI in the deployed container so frontend and API share one origin.
+- [x] Build the React app in the Docker image and serve it from FastAPI so frontend and API share one origin.
 - [ ] Deploy as a Hugging Face Docker Space (or document a concrete tested alternative); expose `GET /health` and `POST /api/recommendations`.
 - [ ] Configure model repo ID and deployment environment variables without committing secrets.
 - [ ] Test the public API from a separate network/session and test a cold start. Keep the endpoint available throughout judging.

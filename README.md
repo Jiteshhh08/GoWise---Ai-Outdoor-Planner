@@ -93,7 +93,18 @@ npm install
 npm run dev
 ```
 
-Configure Vite's dev proxy to forward `/api` and `/health` to `http://127.0.0.1:8000`, or use a documented `VITE_API_BASE_URL`. In production, prefer serving `frontend/dist` from FastAPI to keep the API and UI on the same origin.
+Configure Vite's dev proxy to forward `/api` and `/health` to `http://127.0.0.1:8000`, or use a documented `VITE_API_BASE_URL`. FastAPI serves `frontend/dist` from the same origin when the built folder is present.
+
+### Docker / Hugging Face Space
+
+The root `Dockerfile` builds the React app and serves it through FastAPI on port `7860`. For a local container preview:
+
+```bash
+docker build -t gowise .
+docker run --rm -p 7860:7860 -e MODEL_ID=Qwen/Qwen2.5-1.5B-Instruct gowise
+```
+
+For the competition Space, set `MODEL_ID` in Space variables to the team's **public** Hugging Face model repository after it has been published and verified. Keep the repo public and do not bake credentials into the image. The container has not been deployed or cold-start tested yet; a Docker build and hosted smoke test remain deployment checks.
 
 ### 3. Run checks
 
