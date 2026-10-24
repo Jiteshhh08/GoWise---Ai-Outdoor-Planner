@@ -1,6 +1,7 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { ArrowUpRight, Check, ChevronDown, Clock3, Compass, Leaf, LoaderCircle, MapPin, Menu, Mountain, Sparkles, Wind, X } from 'lucide-react'
 import { requestRecommendation } from './api/recommendations'
+import { getPlannerHealth, type PlannerHealth } from './api/health'
 import RecommendationResults from './components/RecommendationResults'
 import type { RecommendationResponse } from './types/recommendations'
 
@@ -15,6 +16,22 @@ function App() {
   const [result, setResult] = useState<RecommendationResponse | null>(null)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [health, setHealth] = useState<PlannerHealth>('checking')
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
+
+  useEffect(() => {
+    let active = true
+    void getPlannerHealth().then(status => { if (active) setHealth(status) })
+    return () => { active = false }
+  }, [])
+
+  const healthLabel: Record<PlannerHealth, string> = {
+    checking: 'Checking planner',
+    ready: 'Planner ready',
+    'model-not-ready': 'Model starting',
+    'api-unavailable': 'Planner offline',
+    unknown: 'Planner connected',
+  }
 
   async function submit(event?: FormEvent) {
     event?.preventDefault()
@@ -39,9 +56,11 @@ function App() {
       <header className="topbar">
         <a className="brand" href="#home" aria-label="GoWise home"><span className="brand-mark"><Compass size={21} strokeWidth={2.2} /></span><span>go<span className="brand-accent">wise</span></span></a>
         <nav className="desktop-nav" aria-label="Main navigation"><a className="nav-active" href="#planner">Planner</a><a href="#how-it-works">How it works</a><a href="#about">About</a></nav>
+        <div className={`health-indicator health-${health}`} role="status"><span />{healthLabel[health]}</div>
         <a className="topbar-link" href="#planner">Plan your day <ArrowUpRight size={16} /></a>
-        <button className="mobile-menu" aria-label="Open navigation"><Menu size={21} /></button>
+        <button className="mobile-menu" aria-label={mobileNavOpen ? 'Close navigation' : 'Open navigation'} aria-expanded={mobileNavOpen} aria-controls="mobile-navigation" onClick={() => setMobileNavOpen(open => !open)}><Menu size={21} /></button>
       </header>
+      {mobileNavOpen && <nav id="mobile-navigation" className="mobile-navigation" aria-label="Mobile navigation"><a href="#planner" onClick={() => setMobileNavOpen(false)}>Planner</a><a href="#how-it-works" onClick={() => setMobileNavOpen(false)}>How it works</a><a href="#about" onClick={() => setMobileNavOpen(false)}>About</a></nav>}
 
       <main id="home">
         <section className="hero" id="planner">
