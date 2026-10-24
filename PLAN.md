@@ -62,7 +62,7 @@ Official brief: https://geosysiot.in/geoai-hackathon/#guidelines
 - [ ] Test the public API from a separate network/session and test a cold start. Keep the endpoint available throughout judging.
 - [ ] Verify the model repo is public, has an open licence/model card, and loads through `from_pretrained(...)`.
 - [ ] Update `README.md` with actual code-repo URL, model-repo URL, live endpoint URL, base model, data sources, and AI coding-tool disclosure.
-- [ ] Prepare a 4–6 slide presentation: problem/approach, architecture, worked live example, model/data sources, limitations.
+- [x] Prepare a five-slide presentation covering the request flow, architecture, scoring/evidence, and verified/unverified status. Add a real live worked example after provider and model checks pass.
 - [ ] Complete `TESTING.md`; run all commands and record what actually passed.
 
 **Exit check:** all mandatory deliverables are real links, not placeholders; one live query works end to end.

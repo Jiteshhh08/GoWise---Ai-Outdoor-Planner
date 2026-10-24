@@ -11,3 +11,5 @@ frontend/tsconfig.tsbuildinfo
 .pytest_cache/
 .mypy_cache/
 geoai-hackathon-2026-rulebook.pdf
+.codex-build/
+.codex-finalizer/

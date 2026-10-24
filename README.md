@@ -15,7 +15,7 @@ GoWise is a GeoAI Hackathon prototype that recommends **where and when** to do a
 - [ ] Public Hugging Face model repository verified with `from_pretrained(...)`.
 - [ ] Public code repository URL added below.
 - [ ] Live API endpoint URL added below and tested externally.
-- [ ] 4–6 slide presentation completed.
+- [x] 4–6 slide presentation completed.
 
 Do not mark an item complete until it has been tested. Replace every submission placeholder before submitting.
 
@@ -147,7 +147,7 @@ The hackathon requires a **public team model repository** on Hugging Face with t
 - Team model repository: **TODO — add actual public Hugging Face model URL**
 - Live API endpoint: **TODO — add actual deployed `/api/recommendations` URL**
 - Source code repository: **TODO — add actual public Git repository URL**
-- Presentation (4–6 slides): **TODO — add actual URL or location**
+- Presentation (5 slides): [GoWise-GeoAI-Hackathon-2026.pptx](submission/GoWise-GeoAI-Hackathon-2026.pptx)
 - Coding assistant disclosure: **OpenAI Codex (GPT-6)**. No hosted AI model is used by the running assistant; its configured small model runs locally through Transformers.
 
 Never claim a resource is public or online until it has been verified from a clean browser/session.
