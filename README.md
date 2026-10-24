@@ -168,6 +168,7 @@ Never claim a resource is public or online until it has been verified from a cle
 
 ## Submission checklist
 
+- Official submission form: [GeoAI Hackathon 2026 Google Form](https://docs.google.com/forms/d/e/1FAIpQLScGCyinWPD-p7e8oFJflBXHWSZ32Cf177Z7ksJ_5oVRmsH1kg/viewform) (Google sign-in required).
 - [ ] Deployed API responds to an external request and stays reachable during judging.
 - [ ] Public model repo has valid licence and model card and loads by `from_pretrained(...)`.
 - [ ] Public code repo contains the complete source and setup instructions.
