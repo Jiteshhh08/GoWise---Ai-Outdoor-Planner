@@ -6,9 +6,16 @@ import RecommendationResults from './components/RecommendationResults'
 import type { RecommendationResponse } from './types/recommendations'
 
 const prompts = [
-  { icon: '↗', label: 'A run near me', text: 'Where can I go running tomorrow morning near Powai?' },
-  { icon: '◌', label: 'A quiet picnic', text: 'Find a good time for a picnic in a park this weekend around Bandra.' },
-  { icon: '⌁', label: 'A trail to explore', text: 'Where is a nice nature walk near Whitefield this Sunday morning?' },
+  { icon: '↗', label: 'Running', text: 'Where can I go running tomorrow evening near Koregaon Park?' },
+  { icon: '↗', label: 'Cycling', text: 'Is it okay to cycle to work at 8 AM?' },
+  { icon: '◌', label: 'Golf', text: 'Good place and time for golf on Saturday within 40 km of Andheri?' },
+  { icon: '◌', label: 'Cricket', text: 'Best time this weekend for a kids’ cricket match within 15 km of Whitefield?' },
+  { icon: '◌', label: 'Outdoor football', text: 'Where can I play outdoor football this weekend near Powai?' },
+  { icon: '◌', label: 'Outdoor tennis', text: 'Outdoor tennis after work today near Hinjewadi, any good spots?' },
+  { icon: '⌁', label: 'Hiking', text: 'Is Saturday or Sunday better for a hike near Lonavala?' },
+  { icon: '⌁', label: 'Picnic', text: 'What’s a good time for a picnic in a park this weekend near Bandra?' },
+  { icon: '◌', label: 'Outdoor event', text: 'Planning an outdoor birthday party on Sunday afternoon in Pune, what should I keep in mind?' },
+  { icon: '⌁', label: 'Photography', text: 'Where can I take sunset photos this evening around Bandra?' },
 ]
 
 function App() {
@@ -78,7 +85,7 @@ function App() {
               <div className="input-wrap"><textarea id="question" value={question} onChange={e => setQuestion(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void submit() } }} placeholder="e.g. A relaxed evening walk near Powai tomorrow" rows={3} maxLength={500} /><span className="input-hint"><MapPin size={14} /> Add a place and time for a more useful plan</span></div>
               <div className="form-bottom"><span className="privacy-note"><Leaf size={14} /> Your plans stay private</span><button className="submit-button" type="submit" disabled={loading || !question.trim()}>{loading ? <><LoaderCircle size={17} className="spin" /> Finding your plan</> : <>Find my plan <ArrowUpRight size={17} /></>}</button></div>
             </form>
-            <div className="suggestions"><div className="suggestion-label">NEED AN IDEA? <ChevronDown size={13} /></div><div className="prompt-list">{prompts.map(prompt => <button className="prompt-chip" key={prompt.label} onClick={() => { setQuestion(prompt.text); setError(''); setResult(null) }}><span className="prompt-icon">{prompt.icon}</span>{prompt.label}<ArrowUpRight size={13} /></button>)}</div></div>
+            <div className="suggestions"><div className="suggestion-label">QUICK START · ALL 10 ACTIVITIES <ChevronDown size={13} /></div><div className="prompt-list">{prompts.map(prompt => <button className="prompt-chip" key={prompt.label} title={`Use a ${prompt.label.toLowerCase()} example`} onClick={() => { setQuestion(prompt.text); setError(''); setResult(null) }}><span className="prompt-icon">{prompt.icon}</span>{prompt.label}<ArrowUpRight size={13} /></button>)}</div><p className="prompt-help">Examples fill in a sample question. Edit the place and time to fit your plans.</p></div>
             {loading && <div className="status-panel" role="status"><span className="status-icon"><LoaderCircle className="spin" size={17} /></span><span><strong>Checking places and conditions</strong><small>Looking for a good fit around your plans…</small></span></div>}
             {error && <div className="status-panel error-panel" role="alert"><span className="status-icon"><X size={17} /></span><span><strong>We couldn’t make that plan</strong><small>{error}</small></span></div>}
           </div>
