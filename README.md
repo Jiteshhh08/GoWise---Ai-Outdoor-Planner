@@ -19,6 +19,8 @@ GoWise is a GeoAI Hackathon prototype that recommends **where and when** to do a
 
 Do not mark an item complete until it has been tested. Replace every submission placeholder before submitting.
 
+The API foundation and provider clients are being implemented in stages. Until the recommendation pipeline is connected, `POST /api/recommendations` intentionally returns HTTP 503 instead of sample recommendations.
+
 ## Features
 
 - Free-form requests for running/jogging, cycling, golf, cricket, outdoor football/five-a-side, outdoor tennis, hiking/nature walks, picnics/park outings, outdoor events/gatherings, and outdoor photography.
