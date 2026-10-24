@@ -10,6 +10,7 @@ from ..config import settings
 from ..engine.activities import ACTIVITY_RULES, classify_venue
 from ..engine.scoring import GeoFeature, score_candidate_time
 from ..model.local_model import LocalLanguageModel, ModelNotReadyError
+from ..model.evidence_explanation import EvidenceExplainer
 from ..model.query_extraction import QueryClarification, QueryExtractionError, QueryExtractor
 from ..providers.geocoding import GeocodedPlace, NominatimGeocoder
 from ..providers.http import ProviderError
@@ -94,6 +95,7 @@ class RecommendationService:
     def __init__(self, client: httpx.AsyncClient, model: LocalLanguageModel) -> None:
         self.model = model
         self.extractor = QueryExtractor(model)
+        self.explainer = EvidenceExplainer(model)
         self.geocoder = NominatimGeocoder(client)
         self.places = OverpassPlaces(client)
         self.forecast = OpenMeteoForecast(client)
@@ -217,8 +219,11 @@ class RecommendationService:
         evidence: list[EvidenceRecord] = []
         for _score, venue, when, weather_hour, air_hour, _evaluation, weather, air in selected:
             evidence.extend(_result_evidence(venue, when, weather_hour, air_hour, weather, air, osm_result))
+        evidence_summary, explanation_model_ready = await self.explainer.summarize(query.activity, evidence)
         advice = _advice(best[3], best[4], best[6], best[7])
         all_warnings = warnings + provider_errors + list(best[5].warnings)
+        if not explanation_model_ready:
+            all_warnings.append("The local model could not prioritize the evidence; provider facts are shown using the deterministic fallback renderer.")
         if query.profile_flags:
             all_warnings.append("Optional personal context was considered only as a conservative reminder; this is not medical advice and the details are not stored.")
         if len(candidates) == 1:
@@ -227,7 +232,8 @@ class RecommendationService:
         return RecommendationResponse(
             status="partial" if provider_errors or coverage < 0.95 else "ok",
             interpreted_query=parsed, recommendation=options[0], alternatives=options[1:], advice=advice,
-            evidence=evidence, data_sources=list(sources.values()), warnings=list(dict.fromkeys(all_warnings)), coverage=coverage,
+            evidence_summary=evidence_summary, evidence=evidence, data_sources=list(sources.values()),
+            warnings=list(dict.fromkeys(all_warnings)), coverage=coverage,
         )
 
     @staticmethod

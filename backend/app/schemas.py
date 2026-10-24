@@ -81,6 +81,7 @@ class RecommendationResponse(BaseModel):
         "unsupported_activity",
     ]
     clarification_question: str | None = None
+    evidence_summary: str | None = None
     interpreted_query: InterpretedQuery | None = None
     recommendation: RecommendationOption | None = None
     alternatives: list[RecommendationOption] = Field(default_factory=list)

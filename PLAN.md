@@ -39,7 +39,7 @@ Official brief: https://geosysiot.in/geoai-hackathon/#guidelines
 - [x] Implement query extraction to a validated JSON object: activity, location, radius, time range, and explicitly stated profile details.
 - [x] If required fields are missing/ambiguous, ask for clarification instead of guessing.
 - [ ] Publish a public team Hugging Face model repository that meets the rulebook (weights or adapter as required, model card, open licence, and successful `from_pretrained(...)` load). Do not mark this done merely because the upstream base model is public.
-- [ ] Implement a second, constrained generation step that may only explain the structured scores/evidence provided by the backend. Validate its JSON or fall back to a deterministic text renderer.
+- [x] Implement a second, constrained generation step that selects only supplied evidence IDs; validate the IDs and render the explanation deterministically from provider records with a safe fallback.
 - [ ] Never call a hosted LLM/inference API in production.
 
 **Exit check:** logs make it clear the model ran locally; outputs do not contain unsupported factual claims.

@@ -35,6 +35,7 @@ export type DataSource = string | { name?: string; source?: string; url?: string
 export type RecommendationResponse = {
   status?: 'ok' | 'partial' | 'needs_clarification' | 'no_results' | 'data_unavailable' | 'unsupported_activity' | string
   clarification_question?: string
+  evidence_summary?: string
   interpreted_query?: {
     activity?: string
     location_label?: string

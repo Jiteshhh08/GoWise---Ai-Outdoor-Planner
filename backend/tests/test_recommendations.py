@@ -78,6 +78,7 @@ class RecommendationPipelineTests(unittest.TestCase):
         self.assertGreaterEqual(result.coverage, 0.6)
         self.assertTrue(any(item.source == WEATHER_NAME for item in result.evidence))
         self.assertTrue(any(item.source == "Overpass API / OpenStreetMap" for item in result.evidence))
+        self.assertTrue(result.evidence_summary)
         self.assertEqual(result.data_sources[0].name, "Nominatim")
 
     def test_provider_failures_do_not_return_a_fabricated_recommendation(self):
