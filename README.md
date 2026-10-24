@@ -17,7 +17,7 @@ GoWise is a GeoAI Hackathon prototype that recommends **where and when** to do a
 - [x] Live Gradio API endpoint URL added below and smoke-tested externally (the latest call returned a structured ZeroGPU quota failure, not a live recommendation).
 - [x] 4–6 slide presentation completed.
 
-The React production build passes (`npm run build`, 24 October 2026). The backend test suite could not be run in this workspace because `pytest` is not installed. The deployed Space's Gradio JSON endpoint is reachable, but the latest inference attempt returned a ZeroGPU quota error; this is not a successful recommendation test. The public Space also does not expose the separate FastAPI `/health` and `/api/recommendations` routes.
+The React production build passes (`npm run build`, 24 October 2026), and the focused scoring suite passed (8 tests). The full backend suite did not complete in this Windows sandbox because an asyncio/socketpair path hung. The deployed Space's Gradio JSON endpoint is reachable, but the latest inference attempt returned a ZeroGPU quota error; this is not a successful recommendation test. The public Space also does not expose the separate FastAPI `/health` and `/api/recommendations` routes.
 
 Do not mark an item complete until it has been tested. Replace every submission placeholder before submitting.
 

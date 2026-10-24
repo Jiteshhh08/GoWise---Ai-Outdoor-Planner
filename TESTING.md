@@ -2,6 +2,14 @@
 
 The system must remain truthful when data or the model is unavailable. Automated tests should use provider mocks and fixed timestamps; at least one separate manual smoke test must use real APIs before submission.
 
+## Latest verification log — 24 October 2026
+
+- `frontend`: `npm run build` passed.
+- `backend`: `tests/test_scoring.py` passed (8 tests).
+- The full backend pytest suite was attempted but did not complete in this Windows sandbox; the async/socketpair path hung without producing test results. Treat all other backend checks below as unverified.
+- The deployed Gradio JSON endpoint returned a ZeroGPU quota error on the last inference attempt. No live provider-backed recommendation has been verified.
+- The hosted Gradio Space does not expose the source FastAPI app's exact `/health` and `/api/recommendations` routes.
+
 ## 1. Unit tests
 
 ### Query parsing and validation
