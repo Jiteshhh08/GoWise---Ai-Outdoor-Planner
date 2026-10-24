@@ -68,7 +68,7 @@ Adjust this to the actual repository if a similar structure already exists. Do n
 ## 3. Request pipeline
 
 1. **Parse:** send the user's free-form question to the local SLM and request structured JSON: activity, place/area, radius, requested time interval, and only the personal details the user actually stated.
-2. **Validate:** validate supported activity, time bounds, coordinate/radius bounds, and output schema. If location or time is too ambiguous, return a clarification state. Never infer exact user location from browser metadata.
+2. **Validate:** validate supported activity, time bounds, coordinate/radius bounds, and output schema. Resolve a single explicitly named weekday deterministically in the selected local timezone and override a conflicting SLM date; keep multiple named days ambiguous and ask for clarification. If location or time is too ambiguous, return a clarification state. Never infer exact user location from browser metadata.
 3. **Geocode:** resolve the place name using Nominatim. Cache successful lookups and obey its current usage policy.
 4. **Discover candidates:** query Overpass once per bounded area where possible. Keep venue IDs, names, coordinates, OSM tags and source links. Filter to the appropriate type for the requested activity.
 5. **Fetch time-dependent data:** retrieve Open-Meteo hourly weather and air quality for candidate points or a justified representative coordinate. Cache by rounded coordinates and valid time. Record actual fetch timestamps and forecast timestamps separately.

@@ -90,6 +90,62 @@ def _parse_datetime(value: str | None, timezone_name: str) -> datetime | None:
     return parsed.astimezone(timezone.utc)
 
 
+def _weekday_window(question: str, local_now: datetime) -> tuple[datetime, datetime] | None:
+    """Resolve an explicitly named weekday deterministically in the requested place's timezone."""
+    weekdays = {
+        "monday": 0, "mon": 0, "tuesday": 1, "tue": 1, "tues": 1,
+        "wednesday": 2, "wed": 2, "thursday": 3, "thu": 3, "thur": 3, "thurs": 3,
+        "friday": 4, "fri": 4, "saturday": 5, "sat": 5, "sunday": 6, "sun": 6,
+    }
+    weekday_pattern = r"\b(" + "|".join(sorted(weekdays, key=len, reverse=True)) + r")\b"
+    matches = list(re.finditer(weekday_pattern, question.casefold()))
+    if len(matches) != 1:
+        return None
+    match = matches[0]
+
+    target_weekday = weekdays[match.group(1)]
+    prefix = question.casefold()[max(0, match.start() - 24):match.start()]
+    if re.search(r"\b(last|previous)\s+$", prefix):
+        offset = (local_now.weekday() - target_weekday) % 7 or 7
+        day_offset = -offset
+    elif re.search(r"\bthis\s+$", prefix):
+        day_offset = target_weekday - local_now.weekday()
+    else:
+        day_offset = (target_weekday - local_now.weekday()) % 7
+        if day_offset == 0 and re.search(r"\b(next|upcoming)\s+$", prefix):
+            day_offset = 7
+
+    date = (local_now + timedelta(days=day_offset)).date()
+    text = question.casefold()
+    clock = re.search(r"\b(?:at\s*)?(\d{1,2})(?::(\d{2}))?\s*(am|pm)\b", text)
+    if clock:
+        clock_hour = int(clock.group(1))
+        minute = int(clock.group(2) or 0)
+        if not (1 <= clock_hour <= 12 and 0 <= minute <= 59):
+            return None
+        hour = clock_hour % 12 + (12 if clock.group(3) == "pm" else 0)
+        start = datetime.combine(date, datetime.min.time(), tzinfo=local_now.tzinfo).replace(hour=hour, minute=minute)
+        end = start + timedelta(hours=1)
+    else:
+        period = re.search(r"\b(early morning|morning|afternoon|evening|night|sunrise|sunset|midday|noon)\b", text)
+        ranges = {
+            "early morning": (6, 9), "morning": (8, 11), "midday": (11, 14), "noon": (11, 14),
+            "afternoon": (13, 17), "evening": (17, 20), "sunset": (17, 19), "night": (19, 22),
+            "sunrise": (5, 8),
+        }
+        start_hour, end_hour = ranges[period.group(1)] if period else (9, 17)
+        start = datetime.combine(date, datetime.min.time(), tzinfo=local_now.tzinfo).replace(hour=start_hour)
+        end = datetime.combine(date, datetime.min.time(), tzinfo=local_now.tzinfo).replace(hour=end_hour)
+
+    # A bare weekday means the next occurrence. If the weekday is today and its
+    # interpreted window has already ended, roll to next week instead of silently
+    # returning a past forecast window.
+    if day_offset == 0 and end <= local_now and not re.search(r"\b(this|today)\s+$", prefix):
+        start += timedelta(days=7)
+        end += timedelta(days=7)
+    return start, end
+
+
 def _explicit_profile_flags(question: str) -> set[str]:
     text = question.casefold()
     flags: set[str] = set()
@@ -190,8 +246,13 @@ class QueryExtractor:
                 question="I couldn't resolve the local timezone for that place. Could you include its city or region?",
                 warnings=["No forecast times were requested using an unverified timezone."],
             )
-        start_time = _parse_datetime(extraction.start_time, timezone_name)
-        end_time = _parse_datetime(extraction.end_time, timezone_name)
+        local_timezone = ZoneInfo(timezone_name)
+        named_weekday_window = _weekday_window(question, (now or datetime.now(timezone.utc)).astimezone(local_timezone))
+        if named_weekday_window:
+            start_time, end_time = (value.astimezone(timezone.utc) for value in named_weekday_window)
+        else:
+            start_time = _parse_datetime(extraction.start_time, timezone_name)
+            end_time = _parse_datetime(extraction.end_time, timezone_name)
         if start_time is None or end_time is None:
             missing.append("time window")
         if missing:

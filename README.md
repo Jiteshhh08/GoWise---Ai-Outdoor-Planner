@@ -147,9 +147,10 @@ Default model: `Qwen/Qwen2.5-1.5B-Instruct` (1.5B; the Hugging Face listing curr
 The hackathon requires a **public team model repository** on Hugging Face with the required weights or adapter, a model card and an open licence; it must load with `from_pretrained(...)`. An upstream model page by itself is not proof that this deliverable has been completed. Test loading from the team's repository and record the exact model ID below.
 
 - Base model: `Qwen/Qwen2.5-1.5B-Instruct` (verify before submission)
-- Team model repository: **TODO — add actual public Hugging Face model URL**
-- Live API endpoint: **TODO — add actual deployed `/api/recommendations` URL**
-- Source code repository: **TODO — add actual public Git repository URL**
+- Team model repository: [JiteshJha/gowise-qwen2.5-1.5b-instruct](https://huggingface.co/JiteshJha/gowise-qwen2.5-1.5b-instruct) (loaded by the Gradio Space; public card/licence checks remain)
+- Gradio Space: [JiteshJha/goWise](https://huggingface.co/spaces/JiteshJha/goWise)
+- Live API endpoint: [POST `/api/recommendations`](https://jiteshjha-gowise.hf.space/api/recommendations) (deployment verification pending)
+- Source code repository: [Jiteshhh08/GoWise---Ai-Outdoor-Planner](https://github.com/Jiteshhh08/GoWise---Ai-Outdoor-Planner)
 - Presentation (5 slides): [GoWise-GeoAI-Hackathon-2026.pptx](submission/GoWise-GeoAI-Hackathon-2026.pptx)
 - Coding assistant disclosure: **OpenAI Codex (GPT-6)**. No hosted AI model is used by the running assistant; its configured small model runs locally through Transformers.
 

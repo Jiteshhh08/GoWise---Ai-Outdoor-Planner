@@ -88,6 +88,36 @@ class QueryExtractionTests(unittest.TestCase):
         self.assertIsInstance(result, QueryClarification)
         self.assertIn("time window", result.question)
 
+    def test_named_weekday_overrides_model_date_and_resolves_local_evening(self) -> None:
+        model = FakeModel(
+            '{"activity":"cycling","location_label":"Powai","radius_km":null,'
+            '"start_time":"2026-10-24T18:00:00Z","end_time":"2026-10-24T19:00:00Z",'
+            '"timezone":"Asia/Kolkata","profile_flags":[]}'
+        )
+
+        result = asyncio.run(QueryExtractor(model).extract(
+            "Find cycling on Monday evening near Powai",
+            now=datetime(2026, 10, 24, 16, 30, tzinfo=timezone.utc),
+        ))  # type: ignore[arg-type]
+
+        self.assertNotIsInstance(result, QueryClarification)
+        self.assertEqual(result.start_time.isoformat(), "2026-10-26T11:30:00+00:00")
+        self.assertEqual(result.end_time.isoformat(), "2026-10-26T14:30:00+00:00")
+
+    def test_multiple_named_weekdays_remain_ambiguous(self) -> None:
+        model = FakeModel(
+            '{"activity":"hiking","location_label":"Lonavala","radius_km":null,'
+            '"start_time":null,"end_time":null,"timezone":"Asia/Kolkata","profile_flags":[]}'
+        )
+
+        result = asyncio.run(QueryExtractor(model).extract(
+            "Is Saturday or Sunday better for a hike near Lonavala?",
+            now=datetime(2026, 10, 24, 12, tzinfo=timezone.utc),
+        ))  # type: ignore[arg-type]
+
+        self.assertIsInstance(result, QueryClarification)
+        self.assertIn("time window", result.question)
+
     def test_malformed_model_json_fails_closed(self) -> None:
         with self.assertRaises(QueryExtractionError):
             asyncio.run(QueryExtractor(FakeModel("not json")).extract(
