@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { CircleAlert, Clock3, ExternalLink, MapPin, ShieldAlert, Sparkles, Wind } from 'lucide-react'
 import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet'
 import L from 'leaflet'
@@ -13,12 +13,19 @@ function validPoint(option: RecommendationOption | null | undefined): option is 
     && Math.abs(option.latitude) <= 90 && Math.abs(option.longitude) <= 180
 }
 
-function MapBounds({ points }: { points: Array<RecommendationOption & { latitude: number; longitude: number }> }) {
+function MapBounds({ points, selected }: { points: Array<RecommendationOption & { latitude: number; longitude: number }>; selected?: RecommendationOption & { latitude: number; longitude: number } }) {
   const map = useMap()
+  const previousSignature = useRef('')
+  const signature = points.map(point => `${point.latitude},${point.longitude}`).join('|')
   useEffect(() => {
-    if (points.length > 1) map.fitBounds(points.map(point => [point.latitude, point.longitude]), { padding: [38, 38], maxZoom: 14 })
-    else if (points[0]) map.setView([points[0].latitude, points[0].longitude], 14)
-  }, [map, points])
+    if (signature !== previousSignature.current) {
+      previousSignature.current = signature
+      if (points.length > 1) map.fitBounds(points.map(point => [point.latitude, point.longitude]), { padding: [38, 38], maxZoom: 14 })
+      else if (points[0]) map.setView([points[0].latitude, points[0].longitude], 14)
+    } else if (selected) {
+      map.flyTo([selected.latitude, selected.longitude], Math.max(map.getZoom(), 14), { duration: 0.45 })
+    }
+  }, [map, points, selected, signature])
   return null
 }
 
@@ -32,10 +39,10 @@ function prettyLabel(value?: string) {
   return (value || 'Outdoor plan').replaceAll('_', ' ').replace(/\b\w/g, character => character.toUpperCase())
 }
 
-function OptionCard({ option, rank, primary }: { option: RecommendationOption; rank: number; primary?: boolean }) {
+function OptionCard({ option, rank, primary, selected, onSelect }: { option: RecommendationOption; rank: number; primary?: boolean; selected: boolean; onSelect: () => void }) {
   const score = typeof option.suitability_score === 'number' ? option.suitability_score : null
-  return <article className={`recommendation-card${primary ? ' recommendation-primary' : ''}`}>
-    <div className="recommendation-card-top"><span className="rank-label">{primary ? 'BEST MATCH' : `OPTION 0${rank}`}</span>{score !== null && <span className="heuristic-score"><b>{Math.round(score)}</b><small>/ 100 · heuristic</small></span>}</div>
+  return <article className={`recommendation-card${primary ? ' recommendation-primary' : ''}${selected ? ' recommendation-selected' : ''}`}>
+    <div className="recommendation-card-top"><span className="rank-label">{primary ? 'BEST MATCH' : `OPTION 0${rank}`}</span><div className="recommendation-actions">{score !== null && <span className="heuristic-score"><b>{Math.round(score)}</b><small>/ 100 · heuristic</small></span>}{validPoint(option) && <button className="map-focus-button" type="button" aria-pressed={selected} onClick={onSelect}>{selected ? 'On map' : 'Show on map'}</button>}</div></div>
     <h3>{option.name || 'Outdoor location'}</h3>
     <p className="option-time"><Clock3 size={14} />{formatDateTime(option.time)}</p>
     {option.explanation && <p className="option-explanation">{option.explanation}</p>}
@@ -54,7 +61,11 @@ function EvidenceItem({ record }: { record: EvidenceRecord }) {
 
 export default function RecommendationResults({ data }: { data: RecommendationResponse }) {
   const recommendation = data.recommendation || null
-  const options = [recommendation, ...(data.alternatives || [])].filter(validPoint)
+  const allOptions = useMemo(() => [recommendation, ...(data.alternatives || [])].filter((option): option is RecommendationOption => !!option), [recommendation, data.alternatives])
+  const options = useMemo(() => allOptions.filter(validPoint), [allOptions])
+  const [activeOption, setActiveOption] = useState<RecommendationOption | undefined>(recommendation || undefined)
+  useEffect(() => setActiveOption(recommendation || undefined), [recommendation])
+  const activePoint = options.find(option => option === activeOption) || options[0]
   const center = options.length ? [options[0].latitude, options[0].longitude] as [number, number] : [20, 0] as [number, number]
   const coverage = typeof data.coverage === 'number' ? Math.max(0, Math.min(100, data.coverage <= 1 ? data.coverage * 100 : data.coverage)) : null
   const hasAdvice = !!(data.advice?.carry?.length || data.advice?.watch_for?.length || data.advice?.avoid_if?.length)
@@ -73,13 +84,13 @@ export default function RecommendationResults({ data }: { data: RecommendationRe
         <div className="map-frame">
           {options.length ? <MapContainer center={center} zoom={12} scrollWheelZoom={false} className="recommendation-map">
             <TileLayer attribution="&copy; OpenStreetMap contributors" url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-            <MapBounds points={options} />
-            {[recommendation, ...(data.alternatives || [])].filter(validPoint).map((option, index) => <Marker key={option.place_id ?? `${option.latitude}-${option.longitude}-${index}`} position={[option.latitude, option.longitude]} icon={index === 0 ? selectedPin : pin}><Popup><strong>{option.name || 'Outdoor location'}</strong><br />{formatDateTime(option.time)}</Popup></Marker>)}
+            <MapBounds points={options} selected={activePoint} />
+            {options.map((option, index) => <Marker key={option.place_id ?? `${option.latitude}-${option.longitude}-${index}`} position={[option.latitude, option.longitude]} icon={option === activePoint ? selectedPin : pin} eventHandlers={{ click: () => setActiveOption(option) }}><Popup><strong>{option.name || 'Outdoor location'}</strong><br />{formatDateTime(option.time)}</Popup></Marker>)}
           </MapContainer> : <div className="map-unavailable"><MapPin size={22} /><strong>Map coordinates unavailable</strong><span>The API did not return verified coordinates for these options.</span></div>}
           <span className="map-label"><MapPin size={13} /> PLACES IN YOUR PLAN</span>
         </div>
         <div className="options-heading"><h3>Places & times</h3><span>{(data.alternatives?.length || 0) + 1} {((data.alternatives?.length || 0) + 1) === 1 ? 'option' : 'options'}</span></div>
-        <div className="options-list"><OptionCard option={recommendation} rank={1} primary />{(data.alternatives || []).map((option, index) => <OptionCard key={option.place_id ?? `${option.name}-${index}`} option={option} rank={index + 2} />)}</div>
+        <div className="options-list"><OptionCard option={recommendation} rank={1} primary selected={activeOption === recommendation} onSelect={() => setActiveOption(recommendation)} />{(data.alternatives || []).map((option, index) => <OptionCard key={option.place_id ?? `${option.name}-${index}`} option={option} rank={index + 2} selected={activeOption === option} onSelect={() => setActiveOption(option)} />)}</div>
       </div>
       <aside className="evidence-panel">
         <div className="evidence-panel-heading"><div><span className="section-kicker">WHY THIS PLAN</span><h3>Conditions & evidence</h3></div><span className="evidence-count">{data.evidence?.length || 0}</span></div>
