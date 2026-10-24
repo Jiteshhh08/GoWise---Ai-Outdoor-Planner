@@ -6,8 +6,8 @@ Official brief: https://geosysiot.in/geoai-hackathon/#guidelines
 **Deadline:** 24 October 2026, 11:59 PM IST.
 
 ## Phase 0 — repository and scope
-- [ ] Inspect the existing repository before changing files; retain working code and package-lock files.
-- [ ] Create a short task list and agree on a minimal React + FastAPI layout.
+- [x] Inspect the existing repository before changing files; retain working code and package-lock files.
+- [x] Create a short task list and agree on a minimal React + FastAPI layout.
 - [x] Add `.env.example`, `.gitignore`, dependency manifests, and health endpoint.
 - [x] Define Pydantic request/response schemas before building UI.
 
@@ -58,10 +58,10 @@ Official brief: https://geosysiot.in/geoai-hackathon/#guidelines
 ## Phase 5 — deployment and submission assets
 - [x] Build the React app in the Docker image and serve it from FastAPI so frontend and API share one origin.
 - [ ] Deploy as a Hugging Face Docker Space (or document a concrete tested alternative); expose `GET /health` and `POST /api/recommendations`.
-- [ ] Configure model repo ID and deployment environment variables without committing secrets.
+- [x] Configure model repo ID and deployment environment variables without committing secrets (Space model readiness verified; no secret values committed).
 - [ ] Test the public API from a separate network/session and test a cold start. Keep the endpoint available throughout judging.
 - [ ] Verify the model repo is public, has an open licence/model card, and loads through `from_pretrained(...)`.
-- [ ] Update `README.md` with actual code-repo URL, model-repo URL, live endpoint URL, base model, data sources, and AI coding-tool disclosure.
+- [x] Update `README.md` with actual code-repo URL, model-repo URL, live endpoint URL, base model, data sources, and AI coding-tool disclosure.
 - [x] Prepare a five-slide presentation covering the request flow, architecture, scoring/evidence, and verified/unverified status. Add a real live worked example after provider and model checks pass.
 - [ ] Complete `TESTING.md`; run all commands and record what actually passed.
 

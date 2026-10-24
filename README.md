@@ -13,13 +13,13 @@ GoWise is a GeoAI Hackathon prototype that recommends **where and when** to do a
 - [ ] Live OSM / weather / air-quality requests verified.
 - [ ] Open SLM loads locally and is used by the running assistant.
 - [ ] Public Hugging Face model repository verified with `from_pretrained(...)`.
-- [ ] Public code repository URL added below.
-- [ ] Live API endpoint URL added below and tested externally.
+- [x] Public code repository URL added below.
+- [x] Live Gradio API endpoint URL added below and smoke-tested externally (the latest call returned a structured ZeroGPU quota failure, not a live recommendation).
 - [x] 4–6 slide presentation completed.
 
 Do not mark an item complete until it has been tested. Replace every submission placeholder before submitting.
 
-The API foundation, provider clients, local Transformers loader, query extractor, deterministic scoring engine, and recommendation pipeline are implemented. At runtime the local model extracts the query and selects evidence IDs for a deterministic, source-backed explanation; model-generated prose is never passed through as factual output. The endpoint uses live provider calls at request time and returns no recommendation if forecast weather is unavailable. Model weights are not downloaded in this workspace, and a real end-to-end call against upstream providers has not yet been verified. The API therefore remains unready until its local model loads; it returns HTTP 503 rather than sample recommendations during model startup or when model loading fails.
+The API foundation, provider clients, local Transformers loader, query extractor, deterministic scoring engine, and recommendation pipeline are implemented. The Hugging Face Gradio Space reports the team model ready and resolves a named Monday query to the correct upcoming local window. The Gradio HTTP endpoint returns typed JSON, but the latest remote smoke call was blocked by the Space's ZeroGPU run limit; a provider-backed recommendation has not yet been verified. This checkout's separate FastAPI/Docker app still needs its local model loaded and cold-start checked.
 
 ## Features
 
@@ -37,7 +37,7 @@ The scoring pipeline compares multiple tag-matched OSM candidates and hourly for
 - Backend: Python + FastAPI + Pydantic.
 - Runtime SLM: default `Qwen/Qwen2.5-1.5B-Instruct`, loaded locally through Hugging Face Transformers. Verify the current model card and licence before release.
 - Data: OpenStreetMap through Nominatim and Overpass; Open-Meteo Forecast and Air Quality APIs; optional OSRM route estimates.
-- Deployment target: a Hugging Face Docker Space serving both the built frontend and FastAPI on port `7860`.
+- Current deployment: Hugging Face Gradio Space with ZeroGPU. Its machine-readable HTTP endpoint is listed below. The separate React + FastAPI Docker target is not currently deployed.
 
 See `ARCHITECTURE.md` for the API and data flow and `DATA_SOURCES.md` for source/failure policies.
 
@@ -104,7 +104,7 @@ docker build -t gowise .
 docker run --rm -p 7860:7860 -e MODEL_ID=Qwen/Qwen2.5-1.5B-Instruct gowise
 ```
 
-For the competition Space, set `MODEL_ID` in Space variables to the team's **public** Hugging Face model repository after it has been published and verified. Keep the repo public and do not bake credentials into the image. The container has not been deployed or cold-start tested yet; a Docker build and hosted smoke test remain deployment checks.
+The current competition deployment is the Gradio Space linked below. The Docker image remains an alternate deployment path and has not been hosted or cold-start tested. Keep the model repo public and do not bake credentials into the image.
 
 ### 3. Run checks
 
