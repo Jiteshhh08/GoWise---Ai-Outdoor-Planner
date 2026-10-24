@@ -19,7 +19,7 @@ GoWise is a GeoAI Hackathon prototype that recommends **where and when** to do a
 
 Do not mark an item complete until it has been tested. Replace every submission placeholder before submitting.
 
-The API foundation and provider clients are being implemented in stages. Until the recommendation pipeline is connected, `POST /api/recommendations` intentionally returns HTTP 503 instead of sample recommendations.
+The API foundation, provider clients, local Transformers loader, and constrained query extractor are being implemented in stages. Model weights are not downloaded in this workspace, and the recommendation pipeline is not yet connected; `POST /api/recommendations` intentionally returns HTTP 503 instead of sample recommendations.
 
 ## Features
 
@@ -109,6 +109,8 @@ Keep local secrets in `.env` and deployment secrets in the host's secret setting
 | `CACHE_TTL_SECONDS` | Cache lifetime for eligible provider responses. |
 | `REQUEST_TIMEOUT_SECONDS` | External API request timeout. |
 | `MAX_SEARCH_RADIUS_KM` | Hard cap on user-requested search radius. |
+| `DEFAULT_SEARCH_RADIUS_KM` | Search distance used when the user leaves radius unspecified. |
+| `DEFAULT_TIMEZONE` | Local reference timezone for interpreting relative dates. |
 
 Add all implemented variables to `.env.example` and validate them at startup.
 
