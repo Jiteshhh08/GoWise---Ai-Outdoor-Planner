@@ -18,6 +18,13 @@ const prompts = [
   { icon: '⌁', label: 'Photography', text: 'Where can I take sunset photos this evening around Bandra?' },
 ]
 
+const profileOptions = [
+  { id: 'asthma', label: 'Asthma', prompt: 'asthma' },
+  { id: 'pregnancy', label: 'Pregnancy', prompt: 'pregnancy' },
+  { id: 'children', label: 'Children joining', prompt: 'children will be joining' },
+  { id: 'older-adult', label: 'Older adult', prompt: 'an older adult will be joining' },
+]
+
 function App() {
   const [question, setQuestion] = useState('')
   const [result, setResult] = useState<RecommendationResponse | null>(null)
@@ -25,6 +32,7 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [health, setHealth] = useState<PlannerHealth>('checking')
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
+  const [selectedProfiles, setSelectedProfiles] = useState<string[]>([])
 
   useEffect(() => {
     let active = true
@@ -48,7 +56,11 @@ function App() {
     setError('')
     setResult(null)
     try {
-      setResult(await requestRecommendation(cleanQuestion))
+      const profileContext = profileOptions.filter(option => selectedProfiles.includes(option.id)).map(option => option.prompt)
+      const requestQuestion = profileContext.length
+        ? `${cleanQuestion}\n\nOptional personal considerations for general precautions: ${profileContext.join('; ')}.`
+        : cleanQuestion
+      setResult(await requestRecommendation(requestQuestion))
     } catch (cause) {
       setError(cause instanceof Error && cause.name === 'TimeoutError'
         ? 'This request took too long. Please try again in a moment.'
@@ -83,7 +95,8 @@ function App() {
             <form onSubmit={submit}>
               <label className="sr-only" htmlFor="question">Describe the outdoor activity and where or when you want to go</label>
               <div className="input-wrap"><textarea id="question" value={question} onChange={e => setQuestion(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void submit() } }} placeholder="e.g. A relaxed evening walk near Powai tomorrow" rows={3} maxLength={500} /><span className="input-hint"><MapPin size={14} /> Add a place and time for a more useful plan</span></div>
-              <div className="form-bottom"><span className="privacy-note"><Leaf size={14} /> Your plans stay private</span><button className="submit-button" type="submit" disabled={loading || !question.trim()}>{loading ? <><LoaderCircle size={17} className="spin" /> Finding your plan</> : <>Find my plan <ArrowUpRight size={17} /></>}</button></div>
+              <details className="profile-disclosure"><summary>Personal considerations <span>Optional</span></summary><p>Share only what you want considered for general precautions. These selections are sent with this request and aren’t saved by the page.</p><div className="profile-options">{profileOptions.map(option => { const selected = selectedProfiles.includes(option.id); return <button type="button" key={option.id} className={`profile-chip${selected ? ' profile-chip-selected' : ''}`} aria-pressed={selected} onClick={() => setSelectedProfiles(current => selected ? current.filter(id => id !== option.id) : [...current, option.id])}>{selected && <Check size={13} />}{option.label}</button> })}</div><small>This is decision support, not medical advice.</small></details>
+              <div className="form-bottom"><span className="privacy-note"><Leaf size={14} /> Not saved by this page</span><button className="submit-button" type="submit" disabled={loading || !question.trim()}>{loading ? <><LoaderCircle size={17} className="spin" /> Finding your plan</> : <>Find my plan <ArrowUpRight size={17} /></>}</button></div>
             </form>
             <div className="suggestions"><div className="suggestion-label">QUICK START · ALL 10 ACTIVITIES <ChevronDown size={13} /></div><div className="prompt-list">{prompts.map(prompt => <button className="prompt-chip" key={prompt.label} title={`Use a ${prompt.label.toLowerCase()} example`} onClick={() => { setQuestion(prompt.text); setError(''); setResult(null) }}><span className="prompt-icon">{prompt.icon}</span>{prompt.label}<ArrowUpRight size={13} /></button>)}</div><p className="prompt-help">Examples fill in a sample question. Edit the place and time to fit your plans.</p></div>
             {loading && <div className="status-panel" role="status"><span className="status-icon"><LoaderCircle className="spin" size={17} /></span><span><strong>Checking places and conditions</strong><small>Looking for a good fit around your plans…</small></span></div>}
