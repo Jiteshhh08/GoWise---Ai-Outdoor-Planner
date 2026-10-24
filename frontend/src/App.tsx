@@ -1,13 +1,8 @@
 import { useState, type FormEvent } from 'react'
 import { ArrowUpRight, Check, ChevronDown, Clock3, Compass, Leaf, LoaderCircle, MapPin, Menu, Mountain, Sparkles, Wind, X } from 'lucide-react'
-
-type ApiResult = {
-  status?: string
-  interpreted_query?: { activity?: string; location_label?: string; start_time?: string; end_time?: string }
-  recommendation?: { name?: string; explanation?: string; time?: string; suitability_score?: number }
-  warnings?: string[]
-  coverage?: number
-}
+import { requestRecommendation } from './api/recommendations'
+import RecommendationResults from './components/RecommendationResults'
+import type { RecommendationResponse } from './types/recommendations'
 
 const prompts = [
   { icon: '↗', label: 'A run near me', text: 'Where can I go running tomorrow morning near Powai?' },
@@ -17,7 +12,7 @@ const prompts = [
 
 function App() {
   const [question, setQuestion] = useState('')
-  const [result, setResult] = useState<ApiResult | null>(null)
+  const [result, setResult] = useState<RecommendationResponse | null>(null)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -29,15 +24,7 @@ function App() {
     setError('')
     setResult(null)
     try {
-      const response = await fetch('/api/recommendations', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: cleanQuestion }),
-        signal: AbortSignal.timeout(90_000),
-      })
-      const data = await response.json().catch(() => ({}))
-      if (!response.ok) throw new Error(data.detail || `Planner request failed (${response.status}).`)
-      setResult(data)
+      setResult(await requestRecommendation(cleanQuestion))
     } catch (cause) {
       setError(cause instanceof Error && cause.name === 'TimeoutError'
         ? 'This request took too long. Please try again in a moment.'
@@ -75,10 +62,11 @@ function App() {
             <div className="suggestions"><div className="suggestion-label">NEED AN IDEA? <ChevronDown size={13} /></div><div className="prompt-list">{prompts.map(prompt => <button className="prompt-chip" key={prompt.label} onClick={() => { setQuestion(prompt.text); setError(''); setResult(null) }}><span className="prompt-icon">{prompt.icon}</span>{prompt.label}<ArrowUpRight size={13} /></button>)}</div></div>
             {loading && <div className="status-panel" role="status"><span className="status-icon"><LoaderCircle className="spin" size={17} /></span><span><strong>Checking places and conditions</strong><small>Looking for a good fit around your plans…</small></span></div>}
             {error && <div className="status-panel error-panel" role="alert"><span className="status-icon"><X size={17} /></span><span><strong>We couldn’t make that plan</strong><small>{error}</small></span></div>}
-            {result && <div className="status-panel result-panel" role="status"><span className="status-icon"><Check size={17} /></span><span><strong>{result.recommendation?.name || (result.status === 'needs_clarification' ? 'One more detail' : 'Your plan is ready')}</strong><small>{result.recommendation?.explanation || result.warnings?.join(' ') || 'The planner returned a response. More details will appear as the live recommendation view is connected.'}</small>{result.interpreted_query && <small className="query-summary">{[result.interpreted_query.activity, result.interpreted_query.location_label].filter(Boolean).join(' · ')}</small>}</span></div>}
           </div>
           <div className="hero-stamp"><div className="stamp-icon"><Wind size={18} /></div><span>Thoughtful plans,<br /><b>better days outside</b></span></div>
         </section>
+
+        {result && <RecommendationResults data={result} />}
 
         <section className="below-fold" id="how-it-works"><div className="section-intro"><span className="section-kicker">A LITTLE MORE OUT THERE</span><h2>Good plans start<br />with a good moment.</h2></div><div className="feature-grid"><article className="feature-card"><span className="feature-icon green"><MapPin size={20} /></span><span className="feature-index">01 / FIND A PLACE</span><h3>Somewhere that fits</h3><p>Explore parks, trails and outdoor spots around the area you have in mind.</p></article><article className="feature-card"><span className="feature-icon orange"><Clock3 size={20} /></span><span className="feature-index">02 / PICK A MOMENT</span><h3>Time it just right</h3><p>Compare the forecast across your window to find a more comfortable time to go.</p></article><article className="feature-card"><span className="feature-icon blue"><Mountain size={20} /></span><span className="feature-index">03 / GET OUT THERE</span><h3>Know before you go</h3><p>See the conditions, sources and practical notes behind each suggestion.</p></article></div></section>
       </main>
