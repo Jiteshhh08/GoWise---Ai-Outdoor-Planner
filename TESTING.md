@@ -6,6 +6,7 @@ The system must remain truthful when data or the model is unavailable. Automated
 
 - `frontend`: `npm run build` passed.
 - `backend`: `tests/test_scoring.py` passed (8 tests).
+- That focused suite includes coverage that all ten required activity rules have tag-based venue matching.
 - The full backend pytest suite was attempted but did not complete in this Windows sandbox; the async/socketpair path hung without producing test results. Treat all other backend checks below as unverified.
 - The deployed Gradio JSON endpoint returned a ZeroGPU quota error on the last inference attempt. No live provider-backed recommendation has been verified.
 - The hosted Gradio Space does not expose the source FastAPI app's exact `/health` and `/api/recommendations` routes.

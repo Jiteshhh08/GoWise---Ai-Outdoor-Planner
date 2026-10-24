@@ -9,7 +9,7 @@ GoWise is a GeoAI Hackathon prototype that recommends **where and when** to do a
 ## Status
 
 - [ ] Frontend and backend run locally.
-- [ ] Ten required activities tested.
+- [x] Ten required activities have tag-based venue rules covered by the passing scoring suite.
 - [ ] Live OSM / weather / air-quality requests verified.
 - [x] Open SLM is loaded locally in the running Space (`MODEL_ID` readiness visible in the app).
 - [x] Public team model repo has a model card, Apache-2.0 license, and full 1.54B weights; the Space reports the team repo loaded.
