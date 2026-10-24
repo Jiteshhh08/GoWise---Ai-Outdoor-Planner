@@ -220,7 +220,7 @@ class RecommendationService:
         for _score, venue, when, weather_hour, air_hour, _evaluation, weather, air in selected:
             evidence.extend(_result_evidence(venue, when, weather_hour, air_hour, weather, air, osm_result))
         evidence_summary, explanation_model_ready = await self.explainer.summarize(query.activity, evidence)
-        advice = _advice(best[3], best[4], best[6], best[7])
+        advice = _advice(best[3], best[4], best[6], best[7], query.profile_flags)
         all_warnings = warnings + provider_errors + list(best[5].warnings)
         if not explanation_model_ready:
             all_warnings.append("The local model could not prioritize the evidence; provider facts are shown using the deterministic fallback renderer.")
@@ -256,7 +256,13 @@ def _diverse_candidates(features: list[OSMFeature], latitude: float, longitude: 
     return selected
 
 
-def _advice(weather_hour: dict[str, Any], air_hour: dict[str, Any] | None, weather: dict[str, Any], air: dict[str, Any] | None) -> Advice:
+def _advice(
+    weather_hour: dict[str, Any],
+    air_hour: dict[str, Any] | None,
+    weather: dict[str, Any],
+    air: dict[str, Any] | None,
+    profile_flags: list[str] | None = None,
+) -> Advice:
     values = weather_hour.get("values", {})
     carry: list[str] = []
     watch: list[str] = []
@@ -280,6 +286,14 @@ def _advice(weather_hour: dict[str, Any], air_hour: dict[str, Any] | None, weath
     aqi = aq_values.get("european_aqi") or aq_values.get("us_aqi")
     if aqi is not None and aqi > 100:
         watch.append("The modelled regional air-quality index is elevated; it is not an exact-site sensor reading.")
+    profiles = set(profile_flags or [])
+    if "asthma" in profiles:
+        if aqi is None:
+            watch.append("Air-quality data is unavailable for this time; check local conditions before activity.")
+        elif aqi > 50:
+            watch.append("Asthma was mentioned: the regional air-quality forecast is above 50; consider local guidance and adjust effort to personal needs.")
+    if profiles.intersection({"pregnancy", "child", "senior"}) and temperature is not None and temperature >= 30:
+        watch.append("Heat is forecast; consider shade, breaks, and water for the group. This is general planning information, not medical advice.")
     if not carry and not watch and not avoid:
         watch.append("Review the live forecast again before leaving; conditions can change.")
     return Advice(carry=carry, watch_for=watch, avoid_if=avoid)

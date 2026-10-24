@@ -148,7 +148,7 @@ The hackathon requires a **public team model repository** on Hugging Face with t
 - Live API endpoint: **TODO — add actual deployed `/api/recommendations` URL**
 - Source code repository: **TODO — add actual public Git repository URL**
 - Presentation (4–6 slides): **TODO — add actual URL or location**
-- Coding assistant disclosure: **OpenCode; fill in the exact coding model/provider used**
+- Coding assistant disclosure: **OpenAI Codex (GPT-6)**. No hosted AI model is used by the running assistant; its configured small model runs locally through Transformers.
 
 Never claim a resource is public or online until it has been verified from a clean browser/session.
 

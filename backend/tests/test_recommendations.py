@@ -9,7 +9,7 @@ from app.providers.geocoding import GeocodedPlace
 from app.providers.http import ProviderError
 from app.providers.meteo import AIR_QUALITY_NAME, WEATHER_NAME
 from app.providers.osm import OSMFeature, OSMSearchResult
-from app.services.recommendations import RecommendationService
+from app.services.recommendations import RecommendationService, _advice
 
 
 class FakeModel:
@@ -101,6 +101,17 @@ class RecommendationPipelineTests(unittest.TestCase):
         self.assertEqual(result.status, "data_unavailable")
         self.assertIsNone(result.recommendation)
         self.assertTrue(any("Weather data is unavailable" in item for item in result.warnings))
+
+    def test_optional_profiles_only_add_general_advice_tied_to_returned_conditions(self):
+        advice = _advice(
+            {"values": {"temperature_2m": 33}},
+            {"values": {"european_aqi": 72}},
+            {}, {}, ["asthma", "child"],
+        )
+
+        self.assertTrue(any("Asthma was mentioned" in item for item in advice.watch_for))
+        self.assertTrue(any("Heat is forecast" in item for item in advice.watch_for))
+        self.assertTrue(all("safe" not in item.casefold() for item in advice.watch_for))
 
 
 if __name__ == "__main__":
